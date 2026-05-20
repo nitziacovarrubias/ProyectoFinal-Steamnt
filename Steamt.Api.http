@@ -1,0 +1,6 @@
+@Steamt.Api_HostAddress = http://localhost:5105
+
+GET {{Steamt.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
