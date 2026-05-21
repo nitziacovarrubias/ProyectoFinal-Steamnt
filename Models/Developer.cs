@@ -6,6 +6,7 @@ public class Developer
 {
     public int Id { get; set; }
 
+    // usuario al que pertenece este perfil de desarrollador
     public int UserId { get; set; }
 
     [Required]
