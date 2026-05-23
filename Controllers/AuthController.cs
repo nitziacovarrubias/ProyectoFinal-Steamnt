@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Data;
 using Steamnt.Api.Dtos.Auth;
+using Steamnt.Api.Interfaces;
 using Steamnt.Api.Models;
+using Steamnt.Api.Services.Auth;
 
 namespace Steamnt.Api.Controllers;
 
@@ -10,13 +12,13 @@ namespace Steamnt.Api.Controllers;
 [Route("api/[controller]")]
     public class AuthController: ControllerBase
     {
-    private readonly AppDbContext contexto;
-    private readonly AuthService authService;
+    private readonly AppDbContext _contexto;
+    private readonly IAuthService _authService;
 
-    public AuthController(AppDbContext _contexto, AuthService _authService)
+    public AuthController(AppDbContext contexto, IAuthService authService)
     {
-        contexto = _contexto;
-        authService = _authService
+        _contexto = contexto;
+        _authService = authService;
 
     }
 
@@ -28,7 +30,7 @@ public async Task<IActionResult> Register(RegisterDTO dto)
         return BadRequest(ModelState);
     }
 
-    var result = await authService.RegisterAsync(dto);
+    var result = await _authService.RegisterAsync(dto);
 
     if (!result.Success)
     {
@@ -39,15 +41,15 @@ public async Task<IActionResult> Register(RegisterDTO dto)
 }
 
 [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDto dto)
+    public async Task<IActionResult> Login(LoginDTO dto)
     {
-        var result = await authService.LoginAsync(dto);
+        var result = await _authService.LoginAsync(dto);
 
-        if (!result.Success)
+        if (result == null)
         {
-            return BadRequest(result.Message);
+            return BadRequest("Correo o contraseña incorrectos");
         }
 
-        return Ok(result.Message);
+        return Ok(result);
     }
 }

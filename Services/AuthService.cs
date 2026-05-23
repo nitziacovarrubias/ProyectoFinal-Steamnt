@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using MyApi.Data;
-using MyApi.DTOs.Auth;
+using Steamnt.Api.Dtos.Auth;
+using Steamnt.Api.Data;
+using Steamnt.Api.Models;
+using Steamnt.Api.Interfaces;
 
-namespace MyApi.Services.Auth;
+namespace Steamnt.Api.Services.Auth;
 
 public class AuthService : IAuthService
 {
@@ -13,7 +15,7 @@ public class AuthService : IAuthService
         _context = context;
     }
 
-    public async Task<LoginDto?> LoginAsync(LoginRequestDto dto)
+    public async Task<LoginResponseDTO?> LoginAsync(LoginDTO dto)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
@@ -23,12 +25,12 @@ public class AuthService : IAuthService
             return null;
         }
 
-        if (user.Password != dto.Password)
+        if (user.PasswordHash != dto.Password)
         {
             return null;
         }
 
-        return new LoginResponseDto
+        return new LoginResponseDTO
         {
          Id = user.Id,
          Name = user.Name,

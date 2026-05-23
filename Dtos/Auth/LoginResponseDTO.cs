@@ -1,4 +1,4 @@
-namespace MyApi.DTOs.Auth;
+namespace Steamnt.Api.Dtos.Auth;
 
 public class LoginResponseDTO
 {

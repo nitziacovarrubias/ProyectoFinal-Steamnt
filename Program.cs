@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Data;
+using Steamnt.Api.Interfaces;
+using Steamnt.Api.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
