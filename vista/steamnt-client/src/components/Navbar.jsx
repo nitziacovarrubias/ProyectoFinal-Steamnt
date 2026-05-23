@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
 import '../styles/Navbar.css'
+import logoSteamnt from '../assets/logo-steamnt.png'
 
 function Navbar() {
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
-                SteamNT
-            </div>
+<div className="navbar-logo">
+    <img src={logoSteamnt} alt="SteamNT" />
+</div>
 
             <div className="navbar-links">
                 <Link to="/">Inicio</Link>
