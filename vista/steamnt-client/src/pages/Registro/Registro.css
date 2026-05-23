@@ -24,7 +24,6 @@ body,
     background: #111217;
 }
 
-/* Video de fondo */
 .register-bg-video {
     position: absolute;
     inset: 0;
@@ -35,7 +34,7 @@ body,
     filter: brightness(0.42);
 }
 
-/* Capa oscura encima del video */
+/* capa oscura encima del video */
 .register-video-overlay {
     position: absolute;
     inset: 0;
@@ -45,7 +44,6 @@ body,
     z-index: 1;
 }
 
-/* Card */
 .register-card {
     position: relative;
     z-index: 2;
