@@ -11,41 +11,43 @@ namespace Steamnt.Api.Controllers;
     public class AuthController: ControllerBase
     {
     private readonly AppDbContext contexto;
+    private readonly AuthService authService;
 
-    public AuthController(AppDbContext contexto)
+    public AuthController(AppDbContext _contexto, AuthService _authService)
     {
-        this.contexto = contexto;
+        contexto = _contexto;
+        authService = _authService
+
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDTO dto)
+public async Task<IActionResult> Register(RegisterDTO dto)
+{
+    if (!ModelState.IsValid)
     {
-        if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+    }
+
+    var result = await authService.RegisterAsync(dto);
+
+    if (!result.Success)
+    {
+        return BadRequest(result.Message);
+    }
+
+    return Ok(result.Message);
+}
+
+[HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto dto)
+    {
+        var result = await authService.LoginAsync(dto);
+
+        if (!result.Success)
         {
-            return BadRequest(ModelState);
+            return BadRequest(result.Message);
         }
 
-        var emailExists = await contexto.Users
-        .AnyAsync(u => u.Email == dto.Email);
-
-        if (emailExists)
-        {
-            return BadRequest("Ya esta este correo registrado");
-        }
-
-        var user = new User
-        {
-            Name = dto.Name,
-            Email = dto.Email,
-            PasswordHash = dto.Password,
-            Role = "User"
-        };
-
-        await contexto.Users.AddAsync(user);
-
-        await contexto.SaveChangesAsync();
-
-        return Ok("Usuario Creado Correctamente!");
-
+        return Ok(result.Message);
     }
 }

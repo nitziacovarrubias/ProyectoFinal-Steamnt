@@ -1,0 +1,70 @@
+using Microsoft.EntityFrameworkCore;
+using MyApi.Data;
+using MyApi.DTOs.Auth;
+
+namespace MyApi.Services.Auth;
+
+public class AuthService : IAuthService
+{
+    private readonly AppDbContext _context;
+
+    public AuthService(AppDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<LoginDto?> LoginAsync(LoginRequestDto dto)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        if (user.Password != dto.Password)
+        {
+            return null;
+        }
+
+        return new LoginResponseDto
+        {
+         Id = user.Id,
+         Name = user.Name,
+         Role = user.Role
+        };
+    }
+
+    public async Task<ServiceResponse> RegisterAsync(RegisterDTO dto){
+        var emailExists = await _context.Users
+        .AnyAsync(u => u.Email == dto.Email);
+
+    if (emailExists)
+    {
+        return new ServiceResponse
+        {
+            Success = false,
+            Message = "Ya esta este correo registrado"
+        };
+    }
+
+    var user = new User
+    {
+        Name = dto.Name,
+        Email = dto.Email,
+        PasswordHash = dto.Password,
+        Role = "User"
+    };
+
+    await _context.Users.AddAsync(user);
+
+    await _context.SaveChangesAsync();
+
+    return new ServiceResponse
+    {
+        Success = true,
+        Message = "Usuario creado correctamente"
+    };
+    }
+}
