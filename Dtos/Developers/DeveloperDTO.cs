@@ -7,6 +7,7 @@ namespace Steamnt.Api.Dtos.Developers
 {
     public class DeveloperDTO
     {
+        public int Id { get; set; }
         public int UserId { get; set; }
 
         [Required]
