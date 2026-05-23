@@ -9,5 +9,10 @@ namespace Steamnt.Api.Interfaces
     public interface IDeveloperService
     {
         Task<ServiceResponse> BecomeDeveloperAsync(DeveloperDTO dto);
+        Task<List<DeveloperDTO>> GetDevelopers();
+        Task<DeveloperDTO> GetDeveloperById(int id);
+        Task<DeveloperDTO> GetDeveloperByUserId(int userId);
+        Task<DeveloperDTO> EditDeveloper(int id, DeveloperDTO developer);
+        Task<bool> DisableDeveloper(int id);
     }
 }

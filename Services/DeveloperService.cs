@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Steamnt.Api.Dtos.Auth;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Data;
-using Steamnt.Api.Models;
-using Steamnt.Api.Interfaces;
+using Steamnt.Api.Dtos.Auth;
 using Steamnt.Api.Dtos.Developers;
+using Steamnt.Api.Interfaces;
+using Steamnt.Api.Models;
 
 namespace Steamnt.Api.Services;
 
@@ -59,4 +60,64 @@ public class DeveloperService : IDeveloperService
             Message = "Te convertiste en Desarrollador!"
         };
     }
+
+    public async Task<List<DeveloperDTO>> GetDevelopers()
+    {
+        var developers = await _context.Developers.Where(x => x.IsActive).ToListAsync();
+
+        return developers.DTOConverter();
+    }
+
+    public async Task<DeveloperDTO> GetDeveloperById(int id)
+    {
+        var developer = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+
+        if (developer == null)
+            return null;
+
+        return developer.DTOConverter();
+    }
+
+    public async Task<DeveloperDTO> GetDeveloperByUserId(int userId)
+    {
+         var developer = await _context.Developers.FirstOrDefaultAsync(x => x.UserId == userId && x.IsActive);
+
+        if (developer == null)
+            return null;
+
+        return developer.DTOConverter();
+    }
+
+    public async Task<DeveloperDTO> EditDeveloper(int id, DeveloperDTO developer)
+    {
+        var developerEdit = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
+
+        if (developerEdit == null)
+            return null;
+
+        developerEdit.UserId = developer.UserId;
+        developerEdit.StudioName = developer.StudioName;
+        developerEdit.Description = developer.Description;
+        developerEdit.Country = developer.Country;
+
+        await _context.SaveChangesAsync();
+
+        return developerEdit.DTOConverter();
+    }
+
+    public async Task<bool> DisableDeveloper(int id)
+    {
+        var developer = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (developer == null)
+            return false;
+
+        developer.IsActive = false;
+
+        await _context.SaveChangesAsync();
+
+        return true;
+
+    }
+
 }
