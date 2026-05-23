@@ -4,7 +4,7 @@ using Steamnt.Api.Data;
 using Steamnt.Api.Models;
 using Steamnt.Api.Interfaces;
 
-namespace Steamnt.Api.Services.Auth;
+namespace Steamnt.Api.Services;
 
 public class AuthService : IAuthService
 {

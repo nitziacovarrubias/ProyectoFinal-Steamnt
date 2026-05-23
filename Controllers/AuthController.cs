@@ -4,7 +4,7 @@ using Steamnt.Api.Data;
 using Steamnt.Api.Dtos.Auth;
 using Steamnt.Api.Interfaces;
 using Steamnt.Api.Models;
-using Steamnt.Api.Services.Auth;
+using Steamnt.Api.Services;
 
 namespace Steamnt.Api.Controllers;
 
