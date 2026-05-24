@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Registro from './pages/Registro/Registro'
-import Login from './components/Login'
+import Login from './pages/Login/Login'
 import './App.css'
 import {Toaster} from "sonner"
 
