@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Steamnt.Api.Dtos.Developers
 {
-    public static class ConverterDTO
+    public static class DeveloperConverterDTO
     {
         public static DeveloperDTO DTOConverter(this Developer developer)
         {
