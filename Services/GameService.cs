@@ -17,6 +17,19 @@ namespace Steamnt.Api.Services
         {
             _context = context;
         }
+
+        public async Task<List<GameDTO>> GetDeveloperGames(int developerId)
+        {
+            var games = await _context.Games
+        .Include(g => g.Developer)
+        .Include(g => g.GameGenres)
+            .ThenInclude(gg => gg.Genre)
+        .Where(g => g.DeveloperId == developerId && g.IsPublished)
+        .ToListAsync();
+
+            return games.DTOConverter();
+        }
+
         public async Task<List<GameDTO>> GetGames()
         {
             var games = await _context.Games.Where(x => x.IsPublished).ToListAsync();

@@ -15,10 +15,20 @@ public class GamesController : ControllerBase
         _gameService = gameService;
     }
 
+
+
     [HttpGet]
     public async Task<IActionResult> GetGames()
     {
         var games = await _gameService.GetGames();
+
+        return Ok(games);
+    }
+
+    [HttpGet("developer/{developerId}")]
+    public async Task<IActionResult> GetDeveloperGames(int developerId)
+    {
+        var games = await _gameService.GetDeveloperGames(developerId);
 
         return Ok(games);
     }

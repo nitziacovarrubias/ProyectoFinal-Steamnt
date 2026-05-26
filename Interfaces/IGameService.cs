@@ -7,6 +7,8 @@ namespace Steamnt.Api.Interfaces
 {
     public interface IGameService
     {
+
+        Task<List<GameDTO>> GetDeveloperGames(int developerId);
         Task<List<GameDTO>> GetGames();
 
         Task<GameDTO?> GetGameById(int id);
