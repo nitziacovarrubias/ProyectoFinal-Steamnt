@@ -14,6 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IGameService, GameService>();
 
 builder.Services.AddCors(options =>
 {

@@ -17,7 +17,7 @@ public class DeveloperService : IDeveloperService
         _context = context;
     }
 
-    public async Task<ServiceResponse> BecomeDeveloperAsync(DeveloperDTO dto)
+    public async Task<ServiceResponse> BecomeDeveloperAsync(BecomeDeveloperDTO dto)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Id == dto.UserId);
@@ -88,7 +88,7 @@ public class DeveloperService : IDeveloperService
         return developer.DTOConverter();
     }
 
-    public async Task<DeveloperDTO> EditDeveloper(int id, DeveloperDTO developer)
+    public async Task<DeveloperDTO> EditDeveloper(int id, UpdateDeveloperDTO developer)
     {
         var developerEdit = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
 
@@ -107,7 +107,7 @@ public class DeveloperService : IDeveloperService
 
     public async Task<bool> DisableDeveloper(int id)
     {
-        var developer = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id);
+        var developer = await _context.Developers.FirstOrDefaultAsync(x => x.Id == id && x.IsActive);
 
         if (developer == null)
             return false;

@@ -8,11 +8,11 @@ namespace Steamnt.Api.Interfaces
 {
     public interface IDeveloperService
     {
-        Task<ServiceResponse> BecomeDeveloperAsync(DeveloperDTO dto);
+        Task<ServiceResponse> BecomeDeveloperAsync(BecomeDeveloperDTO dto);
         Task<List<DeveloperDTO>> GetDevelopers();
         Task<DeveloperDTO> GetDeveloperById(int id);
         Task<DeveloperDTO> GetDeveloperByUserId(int userId);
-        Task<DeveloperDTO> EditDeveloper(int id, DeveloperDTO developer);
+        Task<DeveloperDTO> EditDeveloper(int id, UpdateDeveloperDTO developer);
         Task<bool> DisableDeveloper(int id);
     }
 }
