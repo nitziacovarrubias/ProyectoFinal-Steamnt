@@ -1,11 +1,12 @@
-﻿using Steamnt.Api.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Steamnt.Api.Data;
+using Steamnt.Api.Dtos.Games;
 using Steamnt.Api.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Steamnt.Api.Dtos.Games;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Steamnt.Api.Services
 {
@@ -30,9 +31,28 @@ namespace Steamnt.Api.Services
             return games.DTOConverter();
         }
 
-        public async Task<List<GameDTO>> GetGames()
+        public async Task<List<GameDTO>> GetGames(string? search, int? genreId)
         {
-            var games = await _context.Games.Where(x => x.IsPublished).ToListAsync();
+            var gamesQuery = _context.Games
+        .Include(g => g.Developer)
+        .Include(g => g.GameGenres)
+            .ThenInclude(gg => gg.Genre)
+        .Where(g => g.IsPublished)
+        .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                gamesQuery = gamesQuery.Where(g =>
+                    g.Title.Contains(search));
+            }
+
+            if (genreId.HasValue)
+            {
+                gamesQuery = gamesQuery.Where(g =>
+                    g.GameGenres.Any(gg => gg.GenreId == genreId.Value));
+            }
+
+            var games = await gamesQuery.ToListAsync();
 
             return games.DTOConverter();
         }

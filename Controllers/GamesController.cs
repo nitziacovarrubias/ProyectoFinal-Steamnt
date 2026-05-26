@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Steamnt.Api.Dtos.Games;
 using Steamnt.Api.Interfaces;
+using Steamnt.Api.Models;
 
 namespace Steamnt.Api.Controllers;
 
@@ -18,9 +19,11 @@ public class GamesController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetGames()
+    public async Task<IActionResult> GetGames(
+    [FromQuery] string? search,
+    [FromQuery] int? genreId)
     {
-        var games = await _gameService.GetGames();
+        var games = await _gameService.GetGames(search, genreId);
 
         return Ok(games);
     }

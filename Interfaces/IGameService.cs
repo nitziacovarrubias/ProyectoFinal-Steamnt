@@ -9,7 +9,7 @@ namespace Steamnt.Api.Interfaces
     {
 
         Task<List<GameDTO>> GetDeveloperGames(int developerId);
-        Task<List<GameDTO>> GetGames();
+        Task<List<GameDTO>> GetGames(string? search, int? genreId);
 
         Task<GameDTO?> GetGameById(int id);
 
