@@ -4,6 +4,7 @@ import Registro from './pages/Registro/Registro'
 import Login from './pages/Login/Login'
 import './App.css'
 import {Toaster} from "sonner"
+import Desarrollador from './pages/Desarrollador/HacerseDesarrollador'
 
 function PaginaBase({ titulo }) {
     return (
@@ -24,7 +25,7 @@ function App() {
                     <Route path="/" element={<PaginaBase titulo="Inicio" />} />
                     <Route path="/store" element={<PaginaBase titulo="Tienda" />} />
                     <Route path="/biblioteca" element={<PaginaBase titulo="Biblioteca" />} />
-                    <Route path="/desarrollador" element={<PaginaBase titulo="Desarrollador" />} />
+                    <Route path="/desarrollador" element={<Desarrollador />} />
                     <Route path="/register" element={<Registro />} />
                     <Route path="/login" element={<Login />} />
                 </Routes>
