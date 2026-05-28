@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import GameCard from '../components/GameCard'
 import { useDispatch, useSelector } from 'react-redux'
 import { listarJuegos } from '../utilities/redux/actions/juegosAction'
 import { listarGeneros } from '../utilities/redux/actions/generosAction'
@@ -40,14 +41,6 @@ function Store() {
 
     function cambiarGenero(e) {
         setGeneroId(e.target.value)
-    }
-
-    function mostrarGeneros(juego) {
-        if (juego.genres && juego.genres.length > 0) {
-            return juego.genres.join(', ')
-        }
-
-        return 'Sin género'
     }
 
     return (
@@ -111,43 +104,7 @@ function Store() {
             {!juegosState.loading && !juegosState.error && juegosState.juegos.length > 0 ? (
                 <section className="store-grid">
                     {juegosState.juegos.map(juego => (
-                        <article className="store-card" key={juego.id}>
-                            <div className="store-card-imagen">
-                                {juego.imageUrl ? (
-                                    <img src={juego.imageUrl} alt={juego.title} />
-                                ) : (
-                                    <span>Sin imagen</span>
-                                )}
-                            </div>
-
-                            <div className="store-card-info">
-                                <span className="store-genero">
-                                    {mostrarGeneros(juego)}
-                                </span>
-
-                                <h2>
-                                    {juego.title}
-                                </h2>
-
-                                <p>
-                                    {juego.description}
-                                </p>
-
-                                <span className="store-desarrollador">
-                                    {juego.developerName}
-                                </span>
-
-                                <div className="store-card-footer">
-                                    <strong>
-                                        ${juego.price}
-                                    </strong>
-
-                                    <button type="button">
-                                        Ver detalle
-                                    </button>
-                                </div>
-                            </div>
-                        </article>
+                        <GameCard key={juego.id} juego={juego} />
                     ))}
                 </section>
             ) : null}
