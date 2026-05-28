@@ -6,6 +6,7 @@ using Steamnt.Api.Dtos.Library;
 using Steamnt.Api.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Models;
+using Steamnt.Api.DTOs;
 
 namespace Steamnt.Api.Services
 {
@@ -64,6 +65,42 @@ namespace Steamnt.Api.Services
             await _context.SaveChangesAsync();
 
             return (true, "Juego agregado correctamente");
+        }
+
+        public async Task<List<LibraryItemDTO>?> GetLibraryItemsPerUser(int userId)
+        {
+            var userExists = await _context.Users
+                .AnyAsync(u => u.Id == userId);
+
+            if (!userExists)
+            {
+                return null;
+            }
+
+            return await _context.LibraryItems
+        .Include(li => li.Game)
+        .ThenInclude(g => g.Developer)
+        .Where(li => li.UserId == userId)
+        .OrderByDescending(li => li.AddedAt)
+        .Select(li => new LibraryItemDTO
+        {
+            LibraryItemId = li.Id,
+
+            GameId = li.GameId,
+
+            Title = li.Game!.Title,
+
+            Description = li.Game.Description,
+
+            Price = li.Game.Price,
+
+            ImageUrl = li.Game.ImageUrl,
+
+            Developer = li.Game.Developer!.StudioName,
+
+            AddedAt = li.AddedAt
+        })
+        .ToListAsync();
         }
     }
 }

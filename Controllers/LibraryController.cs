@@ -33,4 +33,20 @@ public class LibraryController : ControllerBase
             message = result.Message
         });
     }
+
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUserLibrary(int userId)
+    {
+        var library = await _libraryService.GetLibraryItemsPerUser(userId);
+
+        if (library == null)
+        {
+            return NotFound(new
+            {
+                message = "Usuario no encontrado"
+            });
+        }
+
+        return Ok(library);
+    }
 }
