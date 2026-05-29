@@ -14,3 +14,21 @@ export const ListarJuegosUsuario = createAsyncThunk(
         }
     }
 )
+
+export const agregarJuegoALibrary = createAsyncThunk(
+  'library/addGame',
+  async ({ userId, gameId }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/library/add', {
+        userId,
+        gameId
+      })
+
+      return response.data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data ?? 'Error al agregar juego a la biblioteca'
+      )
+    }
+  }
+)

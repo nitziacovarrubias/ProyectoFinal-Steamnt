@@ -10,7 +10,6 @@ import Desarrollador from './pages/Desarrollador/HacerseDesarrollador'
 import './App.css'
 import { Toaster } from "sonner"
 
-
 function App() {
     return (
         <BrowserRouter>

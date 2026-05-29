@@ -5,7 +5,7 @@ export const listarJuegos = createAsyncThunk(
     'juegos/listar',
     async (filtros, { rejectWithValue }) => {
         try {
-            const response = await api.get('/api/Games', {
+            const response = await api.get('/Games', {
                 params: {
                     search: filtros?.busqueda || null,
                     genreId: filtros?.generoId || null

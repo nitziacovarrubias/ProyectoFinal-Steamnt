@@ -1,7 +1,20 @@
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import '../styles/GameCard.css'
+import { agregarJuegoALibrary } from '../utilities/redux/actions/LibraryAction'
 
 function GameCard({ juego }) {
+
+  const dispatch = useDispatch()
+  const libraryState = useSelector((state) => state.library)
+
+  const userId = useSelector((state) => state.auth.usuarioId)
+
+  const addGame = () => {
+    console.log(userId)
+    console.log(juego.id)
+    return dispatch(agregarJuegoALibrary({ userId, gameId: juego.id }))
+  }
 
     function mostrarGeneros() {
         if (juego.genres && juego.genres.length > 0) {
@@ -56,7 +69,7 @@ function GameCard({ juego }) {
                             Ver detalle
                         </Link>
 
-                        <button type="button" className="game-card-biblioteca">
+                        <button onClick={addGame} type="button" className="game-card-biblioteca">
                             Agregar
                         </button>
                     </div>
