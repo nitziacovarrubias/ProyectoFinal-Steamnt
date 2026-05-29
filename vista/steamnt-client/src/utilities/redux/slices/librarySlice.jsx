@@ -1,17 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { ListarJuegosUsuario } from '../actions/LibraryAction'
+import { ListarJuegosUsuario, agregarJuegoALibrary } from '../actions/LibraryAction'
 
 const initialState = {
     libraryGames: [],
     libraryGame: {},
     loading: false,
-    error: null
+    error: null,
+    successMessage: null,
+    errorMessage: null
 }
 
 const librarySlice = createSlice({
     name: 'library',
     initialState,
-    reducers: {},
+    reducers: {clearLibraryMessages: (state) => {
+      state.successMessage = null
+      state.errorMessage = null
+    }},
     extraReducers: (builder) => {
         builder
             .addCase(ListarJuegosUsuario.pending, state => {
@@ -26,6 +31,19 @@ const librarySlice = createSlice({
                 state.loading = false
                 state.error = action.payload
             })
+            .addCase(agregarJuegoALibrary.pending, (state) => {
+            state.loading = true
+            state.successMessage = null
+            state.errorMessage = null
+          })
+            .addCase(agregarJuegoALibrary.fulfilled, (state, action) => {
+            state.loading = false
+            state.successMessage = action.payload?.message ?? 'Juego agregado'
+          })
+            .addCase(agregarJuegoALibrary.rejected, (state, action) => {
+            state.loading = false
+            state.errorMessage = action.payload ?? 'No se pudo agregar el juego'
+          })
     }
 })
 

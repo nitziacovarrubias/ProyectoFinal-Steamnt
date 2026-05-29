@@ -1,13 +1,17 @@
-import { useParams } from "react-router-dom";
+import { useParams  } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from "react";
+import { juegoPorId } from "../../utilities/redux/actions/juegosAction";
 import "./GameDetail.css";
-
 
 function GameDetail() {
 
   const dispatch = useDispatch()
+  const libraryState = useSelector((state) => state.library)
 
   const { id } = useParams();
+
+  const userId = useSelector((state) => state.auth.usuarioId)
 
   const {
     juego,
@@ -15,7 +19,12 @@ function GameDetail() {
     error
   } = useSelector(state => state.juegos);
 
-  console.log(id);
+
+  const addGame = (userId, gameId) => {
+    return dispatch(agregarJuegoALibrary({ userId, gameId: juego.id }))
+  }
+
+  console.log(juego);
 
  useEffect(() => {
 
@@ -56,12 +65,12 @@ function GameDetail() {
 
           <div className="game-meta">
             <p>
-              <strong>Genres:</strong>{" "}
-              {juego.genres.join(", ")}
+              <strong>Generos:</strong>{" "}
+              {juego.genres?.join(", ")}
             </p>
 
             <p>
-              <strong>Developer:</strong>{" "}
+              <strong>Desarrollador:</strong>{" "}
               {juego.developerName}
             </p>
           </div>
@@ -77,7 +86,7 @@ function GameDetail() {
         </div>
 
         <button
-          onClick={() => onAddToLibrary(game)}
+          onClick={() => addGame}
           className="add-library-button"
         >
           Anadir a libreria
