@@ -18,3 +18,15 @@ export const listarJuegos = createAsyncThunk(
         }
     }
 )
+
+export const juegoPorId = createAsyncThunk(
+    'juego/traer',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/Games/${id}`)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response?.data ?? 'Error al listar juegos')
+        }
+    }
+)
