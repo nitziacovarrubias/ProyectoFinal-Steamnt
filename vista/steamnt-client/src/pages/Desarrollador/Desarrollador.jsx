@@ -1,9 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
 
 function Desarrollador() {
-    return <>
-        <Link to="/become-developer">Convertirse en Desarrollador</Link>
-    </>
+    return (
+        <main>
+            <Link to="/desarrollador">
+                Convertirse en Desarrollador
+            </Link>
+        </main>
+    )
 }
 
-export default Desarrollador;
+export default Desarrollador

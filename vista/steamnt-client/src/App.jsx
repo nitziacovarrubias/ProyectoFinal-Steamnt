@@ -7,15 +7,17 @@ import Login from './pages/Login/Login'
 import Library from './pages/Library/Library'
 import GameDetail from './pages/GameDetail/GameDetail'
 import Desarrollador from './pages/Desarrollador/HacerseDesarrollador'
+import Dashboard from './pages/Desarrollador/Dashboard'
+import SidebarLayout from './components/Sidebar/SidebarLayout'
+import { Toaster } from 'sonner'
 import './App.css'
-import { Toaster } from "sonner"
 
 function App() {
     return (
         <BrowserRouter>
             <Navbar />
 
-            <main className="contenido-principal">
+            <SidebarLayout>
                 <Toaster richColors position="bottom-right" />
 
                 <Routes>
@@ -26,8 +28,13 @@ function App() {
                     <Route path="/desarrollador" element={<Desarrollador />} />
                     <Route path="/register" element={<Registro />} />
                     <Route path="/login" element={<Login />} />
+
+                    <Route path="/developer/dashboard" element={<Dashboard />} />
+                    <Route path="/developer/games" element={<Dashboard />} />
+                    <Route path="/developer/publicar" element={<h1>Publicar juego</h1>} />
+                    <Route path="/developer/games/edit/:id" element={<h1>Editar juego</h1>} />
                 </Routes>
-            </main>
+            </SidebarLayout>
         </BrowserRouter>
     )
 }
