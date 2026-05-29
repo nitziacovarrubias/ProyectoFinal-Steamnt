@@ -1,0 +1,80 @@
+.store {
+    padding: 32px;
+}
+
+.store-encabezado {
+    background: linear-gradient(135deg, #111827, #2e1065);
+    border: 1px solid #7c3aed;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: left;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.25);
+}
+
+.store-etiqueta {
+    color: #22d3ee;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+.store-encabezado h1 {
+    color: #c084fc;
+    font-size: 48px;
+    margin: 16px 0;
+    font-weight: 700;
+}
+
+.store-encabezado p {
+    color: white;
+    max-width: 720px;
+    line-height: 1.6;
+}
+
+.store-filtros {
+    margin-top: 28px;
+    display: flex;
+    gap: 16px;
+}
+
+.store-filtros input,
+.store-filtros select {
+    background-color: #1f2937;
+    color: white;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 16px;
+}
+
+.store-filtros input {
+    flex: 1;
+}
+
+.store-filtros input:focus,
+.store-filtros select:focus {
+    outline: none;
+    border-color: #7c3aed;
+}
+
+.store-mensaje,
+.store-error {
+    margin-top: 28px;
+    background-color: #1f2937;
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.store-error {
+    border: 1px solid #ef4444;
+    color: #fecaca;
+}
+
+.store-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}

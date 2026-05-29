@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import Store from './pages/Store'
 import Registro from './pages/Registro/Registro'
 import Login from './pages/Login/Login'
 import './App.css'
@@ -22,7 +23,7 @@ function App() {
                 <Toaster richColors position="bottom-right" />
                 <Routes>
                     <Route path="/" element={<PaginaBase titulo="Inicio" />} />
-                    <Route path="/store" element={<PaginaBase titulo="Tienda" />} />
+                    <Route path="/store" element={<Store />} />
                     <Route path="/biblioteca" element={<PaginaBase titulo="Biblioteca" />} />
                     <Route path="/desarrollador" element={<PaginaBase titulo="Desarrollador" />} />
                     <Route path="/register" element={<Registro />} />
