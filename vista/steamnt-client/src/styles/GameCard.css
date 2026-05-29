@@ -67,13 +67,7 @@
     font-size: 20px;
 }
 
-.game-card-botones {
-    display: flex;
-    gap: 8px;
-}
-
-.game-card-detalle,
-.game-card-biblioteca {
+.game-card-detalle {
     border-radius: 10px;
     padding: 10px 12px;
     font-weight: bold;
@@ -91,13 +85,8 @@
     background-color: #a855f7;
 }
 
-.game-card-biblioteca {
-    background-color: transparent;
-    color: #22d3ee;
-    border: 1px solid #22d3ee;
-}
-
-.game-card-biblioteca:hover {
-    background-color: #22d3ee;
-    color: #111827;
+.game-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
 }

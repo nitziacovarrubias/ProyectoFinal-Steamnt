@@ -20,49 +20,45 @@ function GameCard({ juego }) {
     }
 
     return (
-        <article className="game-card">
-            <div className="game-card-imagen">
-                {juego.imageUrl ? (
-                    <img src={juego.imageUrl} alt={juego.title} />
-                ) : (
-                    <span>Sin imagen</span>
-                )}
-            </div>
+        <Link to={`/game/${juego.id}`} className="game-card-link">
+            <article className="game-card">
+                <div className="game-card-imagen">
+                    {juego.imageUrl ? (
+                        <img src={juego.imageUrl} alt={juego.title} />
+                    ) : (
+                        <span>Sin imagen</span>
+                    )}
+                </div>
 
-            <div className="game-card-info">
-                <span className="game-card-genero">
-                    {mostrarGeneros()}
-                </span>
+                <div className="game-card-info">
+                    <span className="game-card-genero">
+                        {mostrarGeneros()}
+                    </span>
 
-                <h2>
-                    {juego.title}
-                </h2>
+                    <h2>
+                        {juego.title}
+                    </h2>
 
-                <p>
-                    {juego.description}
-                </p>
+                    <p>
+                        {juego.description}
+                    </p>
 
-                <span className="game-card-desarrollador">
-                    {juego.developerName}
-                </span>
+                    <span className="game-card-desarrollador">
+                        {juego.developerName}
+                    </span>
 
-                <div className="game-card-footer">
-                    <strong>
-                        {mostrarPrecio()}
-                    </strong>
+                    <div className="game-card-footer">
+                        <strong>
+                            {mostrarPrecio()}
+                        </strong>
 
-                    <div className="game-card-botones">
-                        <Link to={`/game/${juego.id}`} className="game-card-detalle">
+                        <span className="game-card-detalle">
                             Ver detalle
-                        </Link>
-
-                        <button type="button" className="game-card-biblioteca">
-                            Agregar
-                        </button>
+                        </span>
                     </div>
                 </div>
-            </div>
-        </article>
+            </article>
+        </Link>
     )
 }
 
