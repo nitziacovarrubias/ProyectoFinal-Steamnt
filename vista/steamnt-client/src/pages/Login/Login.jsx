@@ -3,11 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { loginUser } from "../../api/authApi";
+import { useDispatch} from 'react-redux'
 import loginBg from "../../assets/videos/login_bg.mp4";
 import "./Login.css";
+import { setUsuario } from "../../utilities/redux/slices/authSlice";
 
 function Login() {
     const navigate = useNavigate();
+
+    const dispatch = useDispatch()
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -51,6 +55,8 @@ function Login() {
             });
 
             saveUserSession(response);
+
+            dispatch(setUsuario(response))
 
             toast.success("Haz iniciado sesión.");
 

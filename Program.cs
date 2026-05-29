@@ -16,6 +16,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDeveloperService, DeveloperService>();
 builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<ILibraryService, LibraryService>();
 
 builder.Services.AddCors(options =>
 {
