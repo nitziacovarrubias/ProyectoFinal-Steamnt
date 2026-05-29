@@ -1,38 +1,75 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FaGamepad, FaInfoCircle, FaGlobeAmericas, FaRocket } from "react-icons/fa";
-import { convertirseDesarrollador } from "../../api/desarrolladorApi";
+import {
+    FaBars,
+    FaBoxOpen,
+    FaChartLine,
+    FaDownload,
+    FaEdit,
+    FaGamepad,
+    FaHome,
+    FaList,
+    FaPlus,
+    FaRocket,
+    FaSignOutAlt,
+    FaTimes,
+    FaTrash,
+    FaUserCog,
+} from "react-icons/fa";
+import {
+    convertirseDesarrollador,
+    obtenerDesarrolladorPorUsuario,
+} from "../../api/desarrolladorApi";
+import { getGamesByDeveloper } from "../../api/juegosApi";
 import "./HacerseDesarrollador.css";
-import video from "../../assets/videos/pokeball-earth.mp4"
+import video from "../../assets/videos/pokeball-earth.mp4";
+
+const VIDEO_LOOP_END = 5;
+const FAST_FORWARD_RATE = 6;
+
+const getSavedUser = () => {
+    const user = localStorage.getItem("user");
+
+    if (!user) return null;
+
+    try {
+        return JSON.parse(user);
+    } catch {
+        return null;
+    }
+};
+
+const getData = (response) => response?.data ?? response;
+
+const getDownloads = (game) =>
+    game?.downloads ?? game?.downloadCount ?? game?.totalDownloads ?? 0;
 
 function HacerseDesarrollador() {
-    const INTRO_END_TIME = 5;
-    const TRANSFORMATION_SPEED = 6;
     const navigate = useNavigate();
     const videoRef = useRef(null);
-    const isTransformingRef = useRef(false);
+    const isTransforming = useRef(false);
 
     const [stage, setStage] = useState("intro");
-    const [showModal, setShowModal] = useState(false);
-
+    const [showForm, setShowForm] = useState(false);
     const [studioName, setStudioName] = useState("");
     const [description, setDescription] = useState("");
     const [country, setCountry] = useState("");
     const [loading, setLoading] = useState(false);
+    const [developer, setDeveloper] = useState(null);
+    const [games, setGames] = useState([]);
+    const [loadingDashboard, setLoadingDashboard] = useState(false);
+    const [activeSection, setActiveSection] = useState("resumen");
+    const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    const getLoggedUser = () => {
-        const storedUser = localStorage.getItem("user");
-
-        if (!storedUser) {
-            return null;
-        }
-
-        return JSON.parse(storedUser);
-    };
+    const topGames = useMemo(() => {
+        return [...games]
+            .sort((a, b) => getDownloads(b) - getDownloads(a))
+            .slice(0, 5);
+    }, [games]);
 
     useEffect(() => {
-        const user = getLoggedUser();
+        const user = getSavedUser();
         const role = localStorage.getItem("userRole") || user?.role;
 
         if (role === "Developer") {
@@ -41,50 +78,97 @@ function HacerseDesarrollador() {
     }, []);
 
     useEffect(() => {
-        const videoElement = videoRef.current;
+        const player = videoRef.current;
 
-        if (!videoElement || stage === "dashboard") return;
+        if (!player || stage === "dashboard") return;
 
         if (stage === "intro") {
-            isTransformingRef.current = false;
-            videoElement.playbackRate = 1;
-            videoElement.currentTime = 0;
-            videoElement.play().catch(() => {});
+            isTransforming.current = false;
+            player.playbackRate = 1;
+            player.currentTime = 0;
         }
 
         if (stage === "transforming") {
-            videoElement.playbackRate = TRANSFORMATION_SPEED;
-            videoElement.play().catch(() => {});
+            player.playbackRate = FAST_FORWARD_RATE;
         }
+
+        player.play().catch(() => null);
     }, [stage]);
 
-    const handleVideoTimeUpdate = () => {
-        const videoElement = videoRef.current;
+    const loadDashboard = useCallback(async () => {
+        const user = getSavedUser();
+        const userId = localStorage.getItem("userId") || user?.id;
 
-        if (!videoElement) return;
+        if (!userId) {
+            toast.error("Debes iniciar sesión para ver el panel.");
+            navigate("/login");
+            return;
+        }
+
+        try {
+            setLoadingDashboard(true);
+
+            const developerResponse = await obtenerDesarrolladorPorUsuario(userId);
+            const developerData = getData(developerResponse);
+
+            setDeveloper(developerData);
+
+            if (!developerData?.id) {
+                setGames([]);
+                return;
+            }
+
+            localStorage.setItem("developerId", developerData.id);
+
+            const gamesResponse = await getGamesByDeveloper(developerData.id);
+            const gamesData = getData(gamesResponse);
+
+            setGames(Array.isArray(gamesData) ? gamesData : []);
+        } catch (error) {
+            const message =
+                error.response?.data?.message ||
+                error.response?.data ||
+                "No se pudo cargar el panel de desarrollador.";
+
+            toast.error(message);
+        } finally {
+            setLoadingDashboard(false);
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        if (stage === "dashboard") {
+            loadDashboard();
+        }
+    }, [stage, loadDashboard]);
+
+    const handleVideoTimeUpdate = () => {
+        const player = videoRef.current;
+
+        if (!player) return;
 
         if (
             stage === "intro" &&
-            !isTransformingRef.current &&
-            videoElement.currentTime >= INTRO_END_TIME
+            !isTransforming.current &&
+            player.currentTime >= VIDEO_LOOP_END
         ) {
-            videoElement.currentTime = 0;
-            videoElement.play().catch(() => {});
+            player.currentTime = 0;
+            player.play().catch(() => null);
         }
     };
 
     const handleVideoEnded = () => {
-        const videoElement = videoRef.current;
+        const player = videoRef.current;
 
-        if (!videoElement || !isTransformingRef.current) return;
+        if (!player || !isTransforming.current) return;
 
-        videoElement.pause();
-        videoElement.playbackRate = 1;
-        setShowModal(true);
+        player.pause();
+        player.playbackRate = 1;
+        setShowForm(true);
     };
 
-    const handleStartTransformation = () => {
-        const user = getLoggedUser();
+    const startTransformation = () => {
+        const user = getSavedUser();
         const userId = localStorage.getItem("userId") || user?.id;
 
         if (!userId) {
@@ -93,29 +177,26 @@ function HacerseDesarrollador() {
             return;
         }
 
-        const videoElement = videoRef.current;
-
-        isTransformingRef.current = true;
+        isTransforming.current = true;
         setStage("transforming");
-
-        if (videoElement) {
-            videoElement.playbackRate = TRANSFORMATION_SPEED;
-            videoElement.play().catch(() => {});
-        }
     };
 
-    const validateForm = () => {
-        if (!studioName.trim() || !description.trim() || !country.trim()) {
+    const formIsValid = () => {
+        const name = studioName.trim();
+        const info = description.trim();
+        const location = country.trim();
+
+        if (!name || !info || !location) {
             toast.error("Todos los campos son obligatorios.");
             return false;
         }
 
-        if (studioName.trim().length < 3) {
+        if (name.length < 3) {
             toast.error("El nombre del estudio debe tener al menos 3 caracteres.");
             return false;
         }
 
-        if (description.trim().length < 10) {
+        if (info.length < 10) {
             toast.error("La descripción debe tener al menos 10 caracteres.");
             return false;
         }
@@ -123,17 +204,16 @@ function HacerseDesarrollador() {
         return true;
     };
 
-    const updateLocalUserRole = (response) => {
-        const storedUser = getLoggedUser();
+    const saveDeveloperRole = (response) => {
+        const user = getSavedUser();
+        const developerData = getData(response);
 
-        if (!storedUser) return;
-
-        const userData = response.data || response;
+        if (!user) return;
 
         const updatedUser = {
-            ...storedUser,
+            ...user,
             role: "Developer",
-            developerId: userData.id || userData.developerId || storedUser.developerId,
+            developerId: developerData?.id || developerData?.developerId || user.developerId,
         };
 
         localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -147,7 +227,7 @@ function HacerseDesarrollador() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        const user = getLoggedUser();
+        const user = getSavedUser();
         const userId = localStorage.getItem("userId") || user?.id;
 
         if (!userId) {
@@ -156,7 +236,7 @@ function HacerseDesarrollador() {
             return;
         }
 
-        if (!validateForm()) return;
+        if (!formIsValid()) return;
 
         try {
             setLoading(true);
@@ -168,18 +248,15 @@ function HacerseDesarrollador() {
                 country: country.trim(),
             });
 
-            updateLocalUserRole(response);
-
+            saveDeveloperRole(response);
             toast.success("Ahora eres desarrollador en STEAMNT.");
 
-            setTimeout(() => {
-                setShowModal(false);
-                setStage("dashboard");
-            }, 900);
-        } catch (err) {
+            setShowForm(false);
+            setStage("dashboard");
+        } catch (error) {
             const message =
-                err.response?.data?.message ||
-                err.response?.data ||
+                error.response?.data?.message ||
+                error.response?.data ||
                 "No se pudo crear el perfil de desarrollador.";
 
             toast.error(message);
@@ -190,36 +267,249 @@ function HacerseDesarrollador() {
 
     if (stage === "dashboard") {
         return (
-            <main className="developer-dashboard-page">
-                <section className="developer-dashboard-hero">
-                    <p className="developer-dashboard-label">STEAMNT Developer</p>
-                    <h1>Panel de desarrollador</h1>
-                    <p>
-                        Bienvenido a tu espacio para administrar tus videojuegos,
-                        publicaciones y perfil de estudio.
-                    </p>
+            <main className={`developer-panel-page ${sidebarOpen ? "" : "sidebar-closed"}`}>
+                <aside className="developer-sidebar">
+                    <div>
+                        <div className="developer-sidebar-top">
+                            <button
+                                type="button"
+                                className={`sidebar-toggle ${sidebarOpen ? "is-open" : "is-closed"}`}
+                                onClick={() => setSidebarOpen((current) => !current)}
+                                aria-label="Abrir o cerrar menú"
+                            >
+                                {sidebarOpen ? <FaTimes /> : <FaBars />}
+                            </button>
 
-                    <div className="developer-dashboard-actions">
-                        <button>Publicar videojuego</button>
-                        <button className="secondary">Ver mis juegos</button>
+                            <div className="developer-sidebar-brand">
+                                <FaGamepad />
+                            </div>
+                        </div>
+
+                        <nav className="developer-sidebar-nav">
+                            <button
+                                type="button"
+                                className={activeSection === "resumen" ? "active" : ""}
+                                onClick={() => setActiveSection("resumen")}
+                            >
+                                <FaHome />
+                                <span>Resumen</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className={activeSection === "juegos" ? "active" : ""}
+                                onClick={() => setActiveSection("juegos")}
+                            >
+                                <FaList />
+                                <span>Mis juegos</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className={activeSection === "perfil" ? "active" : ""}
+                                onClick={() => setActiveSection("perfil")}
+                            >
+                                <FaUserCog />
+                                <span>Perfil</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => navigate("/developer/games/create")}
+                            >
+                                <FaPlus />
+                                <span>Publicar juego</span>
+                            </button>
+                        </nav>
                     </div>
-                </section>
 
-                <section className="developer-dashboard-grid">
-                    <article>
-                        <h3>Juegos publicados</h3>
-                        <p>0</p>
-                    </article>
+                    <button
+                        type="button"
+                        className="developer-sidebar-exit"
+                        onClick={() => navigate("/store")}
+                    >
+                        <FaSignOutAlt />
+                        <span>Volver a tienda</span>
+                    </button>
+                </aside>
 
-                    <article>
-                        <h3>Estado del perfil</h3>
-                        <p>Activo</p>
-                    </article>
+                <section className="developer-panel-content">
+                    {loadingDashboard ? (
+                        <p className="developer-loading">Cargando panel...</p>
+                    ) : (
+                        <>
+                            {activeSection === "resumen" && (
+                                <>
+                                    <section className="developer-dashboard-hero">
+                                        <p className="developer-dashboard-label">STEAMNT Developer</p>
 
-                    <article>
-                        <h3>Rol actual</h3>
-                        <p>Developer</p>
-                    </article>
+                                        <h1>{developer?.studioName || "Panel de desarrollador"}</h1>
+
+                                        <p>
+                                            {developer?.description ||
+                                                "Administra tus videojuegos, publicaciones y perfil de estudio."}
+                                        </p>
+
+                                        <div className="developer-dashboard-actions">
+                                            <button
+                                                type="button"
+                                                onClick={() => navigate("/developer/games/create")}
+                                            >
+                                                <FaPlus />
+                                                Publicar videojuego
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                className="secondary"
+                                                onClick={() => setActiveSection("juegos")}
+                                            >
+                                                <FaList />
+                                                Ver mis juegos
+                                            </button>
+                                        </div>
+                                    </section>
+
+                                    <section className="developer-downloads-panel">
+                                        <div className="downloads-panel-header">
+                                            <div>
+                                                <p className="developer-dashboard-label">Actividad de la tienda</p>
+                                                <h2>Top descargas</h2>
+                                            </div>
+
+                                            <FaChartLine />
+                                        </div>
+
+                                        {topGames.length === 0 ? (
+                                            <div className="downloads-empty">
+                                                <FaDownload />
+                                                <h3>Aún no hay datos de descargas</h3>
+                                            </div>
+                                        ) : (
+                                            <div className="downloads-list">
+                                                {topGames.map((game, index) => (
+                                                    <article className="download-item" key={game.id}>
+                                                        <div className="download-rank">#{index + 1}</div>
+
+                                                        <div className="download-game-info">
+                                                            <h3>{game.title}</h3>
+                                                            <p>{game.description || "Sin descripción disponible."}</p>
+                                                        </div>
+
+                                                        <div className="download-count">
+                                                            <FaDownload />
+                                                            <span>{getDownloads(game)}</span>
+                                                            <small>descargas</small>
+                                                        </div>
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </section>
+                                </>
+                            )}
+
+                            {activeSection === "juegos" && (
+                                <section className="developer-games-section">
+                                    <div className="developer-section-header">
+                                        <div>
+                                            <h1>Mis juegos publicados</h1>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate("/developer/games/create")}
+                                        >
+                                            <FaPlus />
+                                            Nuevo juego
+                                        </button>
+                                    </div>
+
+                                    {games.length === 0 ? (
+                                        <div className="empty-games">
+                                            <FaBoxOpen />
+                                            <h3>Aún no tienes juegos publicados</h3>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => navigate("/developer/games/create")}
+                                            >
+                                                Publicar mi primer juego
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="developer-games-grid">
+                                            {games.map((game) => (
+                                                <article className="developer-game-card" key={game.id}>
+                                                    <img
+                                                        src={
+                                                            game.imageUrl ||
+                                                            game.coverImageUrl ||
+                                                            "https://via.placeholder.com/400x250?text=STEAMNT"
+                                                        }
+                                                        alt={game.title}
+                                                    />
+
+                                                    <div className="developer-game-content">
+                                                        <h3>{game.title}</h3>
+                                                        <p>{game.description || "Sin descripción disponible."}</p>
+
+                                                        <div className="game-card-footer">
+                                                            <span>
+                                                                {Number(game.price) === 0
+                                                                    ? "Gratis"
+                                                                    : `$${game.price}`}
+                                                            </span>
+
+                                                            <div className="game-actions">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        navigate(`/developer/games/edit/${game.id}`)
+                                                                    }
+                                                                >
+                                                                    <FaEdit />
+                                                                    Editar
+                                                                </button>
+
+                                                                <button type="button" className="danger" disabled>
+                                                                    <FaTrash />
+                                                                    Eliminar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </article>
+                                            ))}
+                                        </div>
+                                    )}
+                                </section>
+                            )}
+
+                            {activeSection === "perfil" && (
+                                <section className="developer-profile-section">
+                                    <h1>Perfil de desarrollador</h1>
+
+                                    <div className="developer-profile-card">
+                                        <p>
+                                            <strong>Estudio:</strong> {developer?.studioName || "Sin nombre"}
+                                        </p>
+                                        <p>
+                                            <strong>Descripción:</strong>{" "}
+                                            {developer?.description || "Sin descripción"}
+                                        </p>
+                                        <p>
+                                            <strong>País:</strong> {developer?.country || "Sin país"}
+                                        </p>
+                                        <p>
+                                            <strong>Estado:</strong>{" "}
+                                            {developer?.isActive === false ? "Inactivo" : "Activo"}
+                                        </p>
+                                    </div>
+                                </section>
+                            )}
+                        </>
+                    )}
                 </section>
             </main>
         );
@@ -239,22 +529,18 @@ function HacerseDesarrollador() {
                 <source src={video} type="video/mp4" />
             </video>
 
-            <div className="developer-video-overlay"></div>
+            <div className="developer-video-overlay" />
 
             {stage === "intro" && (
                 <section className="developer-banner">
                     <p className="developer-kicker">STEAMNT DEV</p>
-
                     <h1>Conviértete en desarrollador de STEAMNT</h1>
-
-                    <p>
-                        Publica tus propios videojuegos dentro de la plataforma.
-                    </p>
+                    <p>Publica tus propios videojuegos dentro de la plataforma.</p>
 
                     <button
                         type="button"
                         className="retro-developer-button"
-                        onClick={handleStartTransformation}
+                        onClick={startTransformation}
                     >
                         <FaRocket />
                         Quiero ser desarrollador
@@ -262,71 +548,17 @@ function HacerseDesarrollador() {
                 </section>
             )}
 
-            {showModal && (
-                <div className="developer-modal-backdrop">
-                    <section className="developer-modal">
-                        <button
-                            type="button"
-                            className="developer-modal-close"
-                            onClick={() => setShowModal(false)}
-                        >
-                            ×
-                        </button>
-
-                        <h2>Crear perfil de desarrollador</h2>
-
-                        <p className="developer-modal-subtitle">
-                            Completa la información.
-                        </p>
-
-                        <form onSubmit={handleSubmit} className="developer-form">
-                            <div className="form-group">
-                                <label>Nombre del estudio</label>
-
-                                <div className="input-icon">
-                                    <FaGamepad />
-                                    <input
-                                        type="text"
-                                        placeholder="Ej. Pixel Studio"
-                                        value={studioName}
-                                        onChange={(event) => setStudioName(event.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Descripción</label>
-
-                                <div className="textarea-icon">
-                                    <FaInfoCircle />
-                                    <textarea
-                                        placeholder="Describe tu estudio"
-                                        value={description}
-                                        onChange={(event) => setDescription(event.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>País</label>
-
-                                <div className="input-icon">
-                                    <FaGlobeAmericas />
-                                    <input
-                                        type="text"
-                                        placeholder="Ej. México"
-                                        value={country}
-                                        onChange={(event) => setCountry(event.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className="developer-submit-button" disabled={loading}>
-                                {loading ? "Creando perfil..." : "Convertirme en desarrollador"}
-                            </button>
-                        </form>
-                    </section>
-                </div>
+            {showForm && (
+                <DesarrolladorModal
+                    studioName={studioName}
+                    setStudioName={setStudioName}
+                    description={description}
+                    setDescription={setDescription}
+                    country={country}
+                    setCountry={setCountry}
+                    loading={loading}
+                    handleSubmit={handleSubmit}
+                />
             )}
         </main>
     );
