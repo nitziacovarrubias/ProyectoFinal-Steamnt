@@ -1,91 +1,56 @@
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
 import '../styles/GameCard.css'
 import { agregarJuegoALibrary } from '../utilities/redux/actions/LibraryAction'
-
-const imagenesLocales = {
-    pokemon: '/images/home/top-pokemon.jpg',
-    pokémon: '/images/home/top-pokemon.jpg',
-    minecraft: '/images/home/top-minecraft.jpg',
-    dora: '/images/home/dora.jpg',
-    hermosillo: '/images/home/hermosillo.jpg',
-    obregon: '/images/home/top-gta-obregon.jpg',
-    obregón: '/images/home/top-gta-obregon.jpg',
-    huelga: '/images/home/top-ith-huelga.jpg'
-}
-
-function obtenerImagenJuego(juego) {
-    if (juego.imageUrl) {
-        return juego.imageUrl
-    }
-
-    const titulo = juego.title?.toLowerCase() || ''
-
-    const claveImagen = Object.keys(imagenesLocales).find(clave =>
-        titulo.includes(clave)
-    )
-
-    return claveImagen ? imagenesLocales[claveImagen] : '/images/home/default-game.jpg'
-}
 
 function GameCard({ juego }) {
     const dispatch = useDispatch()
 
-    const userIdRedux = useSelector((state) => state.auth.usuarioId)
+    const authState = useSelector((state) => state.auth)
+    const userId = authState.usuario?.id
 
-    function obtenerUserId() {
-        if (userIdRedux) {
-            return userIdRedux
-        }
-
-        try {
-            const user = JSON.parse(localStorage.getItem('user'))
-            return user?.id
-        } catch {
-            return null
-        }
-    }
-
-    function addGame() {
-        const userId = obtenerUserId()
+    const addGame = async (e) => {
+        e.preventDefault()
+        e.stopPropagation()
 
         if (!userId) {
+            toast.error('Debes iniciar sesión para agregar juegos a tu biblioteca')
             return
         }
 
-        dispatch(agregarJuegoALibrary({ userId, gameId: juego.id }))
+        try {
+            const response = await dispatch(agregarJuegoALibrary({
+                userId,
+                gameId: juego.id
+            })).unwrap()
+
+            toast.success(response?.message ?? 'Juego agregado a tu biblioteca')
+        } catch (error) {
+            toast.error(error || 'No se pudo agregar el juego')
+        }
     }
 
     function mostrarGeneros() {
         if (juego.genres && juego.genres.length > 0) {
-            return juego.genres
-                .map(genero => typeof genero === 'string' ? genero : genero.name)
-                .join(', ')
+            return juego.genres.join(', ')
         }
 
         return 'Sin género'
     }
 
     function mostrarPrecio() {
-        const precio = Number(juego.price)
-
-        if (precio === 0) {
+        if (juego.price === 0) {
             return 'Gratis'
         }
 
-        return `$${precio.toFixed(2)}`
+        return `$${juego.price}`
     }
 
     return (
         <article className="game-card">
             <Link to={`/game/${juego.id}`} className="game-card-imagen">
-                <img
-                    src={obtenerImagenJuego(juego)}
-                    alt={juego.title}
-                    onError={(e) => {
-                        e.currentTarget.src = '/images/home/default-game.jpg'
-                    }}
-                />
+                <img src={juego.imageUrl} alt={juego.title} />
             </Link>
 
             <div className="game-card-info">
@@ -93,29 +58,30 @@ function GameCard({ juego }) {
                     {mostrarGeneros()}
                 </span>
 
-                <h2>
-                    {juego.title}
-                </h2>
+                <h2>{juego.title}</h2>
 
-                <p>
-                    {juego.description}
-                </p>
+                <p>{juego.description}</p>
 
                 <span className="game-card-desarrollador">
-                    {juego.developerName || 'Desarrollador desconocido'}
+                    {juego.developer || 'Desarrollador no disponible'}
                 </span>
 
                 <div className="game-card-footer">
-                    <strong>
-                        {mostrarPrecio()}
-                    </strong>
+                    <strong>{mostrarPrecio()}</strong>
 
                     <div className="game-card-botones">
-                        <Link to={`/game/${juego.id}`} className="game-card-detalle">
+                        <Link 
+                            to={`/game/${juego.id}`} 
+                            className="game-card-detalle"
+                        >
                             Ver detalle
                         </Link>
 
-                        <button onClick={addGame} type="button" className="game-card-biblioteca">
+                        <button
+                            type="button"
+                            className="game-card-biblioteca"
+                            onClick={addGame}
+                        >
                             Agregar
                         </button>
                     </div>
