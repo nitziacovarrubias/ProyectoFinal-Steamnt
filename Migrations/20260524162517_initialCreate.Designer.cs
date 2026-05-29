@@ -12,8 +12,8 @@ using Steamnt.Api.Data;
 namespace Steamnt.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260522001224_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260524162517_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
