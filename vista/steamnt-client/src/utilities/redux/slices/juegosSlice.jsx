@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { listarJuegos } from '../actions/juegosAction'
+import { listarJuegos, juegoPorId } from '../actions/juegosAction'
 
 const initialState = {
     juegos: [],
@@ -23,6 +23,18 @@ const juegosSlice = createSlice({
                 state.juegos = action.payload
             })
             .addCase(listarJuegos.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            .addCase(juegoPorId.pending, state => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(juegoPorId.fulfilled, (state, action) => {
+                state.loading = false
+                state.juego = action.payload
+            })
+            .addCase(juegoPorId.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
             })

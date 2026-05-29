@@ -7,6 +7,7 @@ import Login from './pages/Login/Login'
 import './App.css'
 import {Toaster} from "sonner"
 import Library from './pages/Library/Library'
+import GameDetail from './pages/GameDetail/GameDetail'
 
 function PaginaBase({ titulo }) {
     return (
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                     <Route path="/store" element={<Store />} />
                     <Route path="/biblioteca" element={<Library/>} />
+                    <Route path="/game:id" element={<GameDetail />} />
                     <Route path="/desarrollador" element={<PaginaBase titulo="Desarrollador" />} />
                     <Route path="/register" element={<Registro />} />
                     <Route path="/login" element={<Login />} />

@@ -1,0 +1,12 @@
+.game-main-section {
+  display: flex;
+  gap: 2rem;
+}
+
+.game-image-container {
+  width: 75%;
+}
+
+.game-info {
+  width: 25%;
+}
