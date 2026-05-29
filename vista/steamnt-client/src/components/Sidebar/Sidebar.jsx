@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import {
     FaBars,
@@ -20,8 +20,8 @@ import './Sidebar.css'
 
 function Sidebar({ collapsed, setCollapsed }) {
     const navigate = useNavigate()
+    const location = useLocation()
     const [user, setUser] = useState(null)
-
     const loadUser = () => {
         try {
             const storedUser = localStorage.getItem('user')
@@ -41,10 +41,11 @@ function Sidebar({ collapsed, setCollapsed }) {
             window.removeEventListener('storage', loadUser)
             window.removeEventListener('userUpdated', loadUser)
         }
-    }, [])
+    }, [location.pathname])
 
     const role = user?.role || localStorage.getItem('userRole')
     const isDeveloper = role?.toLowerCase() === 'developer'
+    
 
     const userInitial = user?.name?.charAt(0)?.toUpperCase() || 'U'
 
@@ -118,6 +119,7 @@ function Sidebar({ collapsed, setCollapsed }) {
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        end={item.path === '/'}
                         className={({ isActive }) =>
                             isActive ? 'sidebar-link active' : 'sidebar-link'
                         }

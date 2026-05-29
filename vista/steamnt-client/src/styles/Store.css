@@ -1,80 +1,215 @@
 .store {
-    padding: 32px;
-}
-
-.store-encabezado {
-    background: linear-gradient(135deg, #111827, #2e1065);
-    border: 1px solid #7c3aed;
-    border-radius: 16px;
-    padding: 40px;
+    min-height: calc(100vh - 72px);
+    padding: 42px 46px 70px;
+    padding-top: 130px;
+    background: #070b14;
+    color: #f8fafc;
     text-align: left;
-    box-shadow: 0 0 30px rgba(124, 58, 237, 0.25);
 }
 
-.store-etiqueta {
-    color: #22d3ee;
-    font-weight: bold;
-    letter-spacing: 1px;
-    font-size: 14px;
+.store-inner {
+    width: min(100%, 1520px);
+    margin: 0 auto;
 }
 
-.store-encabezado h1 {
-    color: #c084fc;
-    font-size: 48px;
-    margin: 16px 0;
+
+.store-hero {
+    min-height: 220px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+
+    padding: 38px 42px;
+
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background:
+        linear-gradient(120deg, rgba(15, 23, 42, 0.94), rgba(49, 16, 105, 0.64)),
+        linear-gradient(90deg, #0b1220, #111827);
+}
+
+.store-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+
+    color: #38bdf8;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+}
+
+.store-hero h1 {
+    margin: 0 0 12px;
+
+    color: #ffffff;
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    line-height: 1;
+    letter-spacing: -0.06em;
     font-weight: 700;
 }
 
-.store-encabezado p {
-    color: white;
+.store-hero p {
     max-width: 720px;
+    margin: 0;
+
+    color: #cbd5e1;
+    font-size: 0.96rem;
     line-height: 1.6;
 }
 
-.store-filtros {
+.store-hero-summary {
+    min-width: 190px;
+    padding: 24px;
+
+    border-left: 1px solid rgba(148, 163, 184, 0.16);
+    text-align: right;
+}
+
+.store-hero-summary span {
+    display: block;
+
+    color: #ffffff;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.store-hero-summary p {
+    margin-top: 8px;
+
+    color: #94a3b8;
+    font-size: 0.84rem;
+}
+
+.store-toolbar {
     margin-top: 28px;
-    display: flex;
-    gap: 16px;
+
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 14px;
 }
 
-.store-filtros input,
-.store-filtros select {
-    background-color: #1f2937;
-    color: white;
-    border: 1px solid #334155;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 16px;
-}
+.store-search input,
+.store-toolbar select {
+    width: 100%;
+    height: 48px;
 
-.store-filtros input {
-    flex: 1;
-}
+    padding: 0 16px;
 
-.store-filtros input:focus,
-.store-filtros select:focus {
+    border-radius: 0;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: #0f172a;
+
+    color: #ffffff;
+    font-size: 0.92rem;
+    font-family: inherit;
+
     outline: none;
-    border-color: #7c3aed;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
 }
 
-.store-mensaje,
+.store-search input::placeholder {
+    color: #64748b;
+}
+
+.store-search input:focus,
+.store-toolbar select:focus {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: #111c2f;
+}
+
+
+.store-results-header {
+    margin-top: 38px;
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.store-results-header span {
+    display: block;
+    margin-bottom: 6px;
+
+    color: #38bdf8;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+}
+
+.store-results-header h2 {
+    margin: 0;
+
+    color: #ffffff;
+    font-size: 1.45rem;
+    letter-spacing: -0.04em;
+}
+
+
+.store-message,
 .store-error {
-    margin-top: 28px;
-    background-color: #1f2937;
-    border-radius: 12px;
-    padding: 20px;
-    color: white;
+    margin-top: 24px;
+    padding: 22px;
+
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: #0f172a;
+
+    color: #cbd5e1;
     text-align: center;
 }
 
 .store-error {
-    border: 1px solid #ef4444;
+    border-color: rgba(239, 68, 68, 0.42);
     color: #fecaca;
+    background: rgba(127, 29, 29, 0.18);
 }
 
+
 .store-grid {
-    margin-top: 28px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 1300px) {
+    .store-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .store {
+        padding: 28px 22px 56px;
+    }
+
+    .store-hero {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 32px 28px;
+    }
+
+    .store-hero-summary {
+        width: 100%;
+        min-width: auto;
+
+        padding: 18px 0 0;
+
+        border-left: none;
+        border-top: 1px solid rgba(148, 163, 184, 0.16);
+
+        text-align: left;
+    }
+
+    .store-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .store-grid {
+        grid-template-columns: 1fr;
+    }
 }

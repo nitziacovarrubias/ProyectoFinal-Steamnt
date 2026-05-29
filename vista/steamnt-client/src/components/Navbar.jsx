@@ -1,25 +1,67 @@
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import '../styles/Navbar.css'
 import logoSteamnt from '../assets/logo-steamnt.png'
 
 function Navbar() {
+    const [user, setUser] = useState(null)
+
+    const loadUser = () => {
+        try {
+            const storedUser = localStorage.getItem('user')
+            setUser(storedUser ? JSON.parse(storedUser) : null)
+        } catch {
+            setUser(null)
+        }
+    }
+
+    useEffect(() => {
+        loadUser()
+
+        window.addEventListener('storage', loadUser)
+        window.addEventListener('userUpdated', loadUser)
+
+        return () => {
+            window.removeEventListener('storage', loadUser)
+            window.removeEventListener('userUpdated', loadUser)
+        }
+    }, [])
+
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
+            <NavLink to="/" className="navbar-logo">
                 <img src={logoSteamnt} alt="SteamNT" />
-            </div>
+            </NavLink>
 
             <div className="navbar-links">
-                <Link to="/">Inicio</Link>
-                <Link to="/store">Tienda</Link>
-                <Link to="/biblioteca">Biblioteca</Link>
-                <Link to="/desarrollador">Desarrollador</Link>
+                <NavLink to="/" end>
+                    Inicio
+                </NavLink>
+
+                <NavLink to="/store">
+                    Tienda
+                </NavLink>
+
+                <NavLink to="/biblioteca">
+                    Biblioteca
+                </NavLink>
+
+                <NavLink to="/desarrollador">
+                    Desarrollador
+                </NavLink>
             </div>
 
-            <div className="navbar-auth">
-                <Link to="/register" className="register-btn">Registro</Link>
-                <Link to="/login" className="login-btn">Login</Link>
-            </div>
+            {!user && (
+                <div className="navbar-auth">
+                    <NavLink to="/login" className="login-btn">
+                        Login
+                    </NavLink>
+
+                    <NavLink to="/register" className="register-btn">
+                        Registro
+                    </NavLink>
+                </div>
+            )}
         </nav>
     )
 }

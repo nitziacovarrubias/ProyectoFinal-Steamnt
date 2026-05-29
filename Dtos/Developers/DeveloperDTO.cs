@@ -19,5 +19,11 @@ namespace Steamnt.Api.Dtos.Developers
 
         [MaxLength(100)]
         public string Country { get; set; } = string.Empty; 
+
+        [MaxLength(500)]
+        public string LogoUrl { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string BannerUrl { get; set; } = string.Empty;
     }
 }

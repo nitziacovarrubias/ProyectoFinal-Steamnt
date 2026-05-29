@@ -23,6 +23,9 @@ public class User
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    [MaxLength(500)]
+    public string AvatarUrl { get; set; } = string.Empty;
+
     // perfil de desarrollador en caso de que el usuario decida convertirse en desarrollador
     public Developer? DeveloperProfile { get; set; }
 

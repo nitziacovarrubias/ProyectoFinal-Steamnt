@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Steamnt.Api.Models;
+using System;
+using System.Linq;
 
 namespace Steamnt.Api.Data;
 
@@ -10,92 +12,28 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
-
     public DbSet<Developer> Developers { get; set; }
-
     public DbSet<Game> Games { get; set; }
-
     public DbSet<Genre> Genres { get; set; }
-
     public DbSet<GameGenre> GameGenres { get; set; }
-
     public DbSet<LibraryItem> LibraryItems { get; set; }
-
     public DbSet<Download> Downloads { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // un usuario solo puede tener un perfil de desarrollador
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+        // 1. Solución al error de SQL Server: Evitar ciclos de eliminación en cascada globalmente
+        var cascadeFKs = modelBuilder.Model.GetEntityTypes()
+            .SelectMany(t => t.GetForeignKeys())
+            .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.DeveloperProfile)
-            .WithOne(d => d.User)
-            .HasForeignKey<Developer>(d => d.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        foreach (var fk in cascadeFKs)
+        {
+            fk.DeleteBehavior = DeleteBehavior.Restrict;
+        }
 
-        modelBuilder.Entity<Developer>()
-            .HasIndex(d => d.UserId)
-            .IsUnique();
-
-        // Un desarrollador puede publicar varios juegos
-        modelBuilder.Entity<Game>()
-            .HasOne(g => g.Developer)
-            .WithMany(d => d.Games)
-            .HasForeignKey(g => g.DeveloperId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Relación muchos a muchos entre juegos y géneros
-        modelBuilder.Entity<GameGenre>()
-            .HasOne(gg => gg.Game)
-            .WithMany(g => g.GameGenres)
-            .HasForeignKey(gg => gg.GameId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<GameGenre>()
-            .HasOne(gg => gg.Genre)
-            .WithMany(g => g.GameGenres)
-            .HasForeignKey(gg => gg.GenreId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<GameGenre>()
-            .HasIndex(gg => new { gg.GameId, gg.GenreId })
-            .IsUnique();
-
-        // relación de biblioteca del usuario
-        modelBuilder.Entity<LibraryItem>()
-            .HasOne(li => li.User)
-            .WithMany(u => u.LibraryItems)
-            .HasForeignKey(li => li.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<LibraryItem>()
-            .HasOne(li => li.Game)
-            .WithMany(g => g.LibraryItems)
-            .HasForeignKey(li => li.GameId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<LibraryItem>()
-            .HasIndex(li => new { li.UserId, li.GameId })
-            .IsUnique();
-
-        // historial de descargas
-        modelBuilder.Entity<Download>()
-            .HasOne(d => d.User)
-            .WithMany(u => u.Downloads)
-            .HasForeignKey(d => d.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Download>()
-            .HasOne(d => d.Game)
-            .WithMany(g => g.Downloads)
-            .HasForeignKey(d => d.GameId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+        // 2. Llamar al método para seedear los datos de prueba
         SeedData(modelBuilder);
     }
 
@@ -184,7 +122,7 @@ public class AppDbContext : DbContext
                 Title = "Pokémon",
                 Description = "Pues Pokémon",
                 Price = 10.00m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=Pokemon+Region+Sonora",
+                ImageUrl = "/images/home/top-pokemon.jpg",
                 DownloadUrl = "https://example.com/pokemon-region-sonora.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -197,7 +135,7 @@ public class AppDbContext : DbContext
                 Title = "Minecraft",
                 Description = "Pues Minecraft",
                 Price = 35.50m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=Minecraft",
+                ImageUrl = "/images/home/top-minecraft.jpg",
                 DownloadUrl = "https://example.com/minecraft.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -210,7 +148,7 @@ public class AppDbContext : DbContext
                 Title = "Captura a Dora la Exploradora",
                 Description = "Juego de aventura donde debes capturar a Dora antes de que sea demasiado tarde y llegue a otro continente.",
                 Price = 3.99m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=Captura+a+Dora",
+                ImageUrl = "/images/home/dora.jpg",
                 DownloadUrl = "https://example.com/captura-a-dora.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -223,7 +161,7 @@ public class AppDbContext : DbContext
                 Title = "Un Paseo por Hermosillo",
                 Description = "Explora Hermosillo, visita Pueblitos, sobrevive al calor y a los baches.",
                 Price = 24.99m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=Un+Paseo+por+Hermosillo",
+                ImageUrl = "/images/home/hermosillo.jpg",
                 DownloadUrl = "https://example.com/paseo-hermosillo.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -236,7 +174,7 @@ public class AppDbContext : DbContext
                 Title = "GTA Obregón",
                 Description = "Juego de mundo abierto donde recorres Obregón y tratas de no quedarte sin gasolina.",
                 Price = 35.50m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=GTA+Obregon",
+                ImageUrl = "/images/home/top-gta-obregon.jpg",
                 DownloadUrl = "https://example.com/gta-obregon.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -249,7 +187,7 @@ public class AppDbContext : DbContext
                 Title = "ITH en Huelga",
                 Description = "Intenta entrar al ITH mientras se presenta una huelga por el precio de los papaboneless",
                 Price = 34.99m,
-                ImageUrl = "https://via.placeholder.com/400x250?text=huelga+ITH",
+                ImageUrl = "/images/home/top-ith-huelga.jpg",
                 DownloadUrl = "https://example.com/huelga-ith.zip",
                 ReleaseDate = seedDate,
                 IsPublished = true,
@@ -258,78 +196,18 @@ public class AppDbContext : DbContext
         );
 
         modelBuilder.Entity<GameGenre>().HasData(
-            new GameGenre
-            {
-                Id = 1,
-                GameId = 1,
-                GenreId = 3
-            },
-            new GameGenre
-            {
-                Id = 2,
-                GameId = 1,
-                GenreId = 2
-            },
-            new GameGenre
-            {
-                Id = 3,
-                GameId = 2,
-                GenreId = 2
-            },
-            new GameGenre
-            {
-                Id = 4,
-                GameId = 2,
-                GenreId = 5
-            },
-            new GameGenre
-            {
-                Id = 5,
-                GameId = 3,
-                GenreId = 1
-            },
-            new GameGenre
-            {
-                Id = 6,
-                GameId = 3,
-                GenreId = 2
-            },
-            new GameGenre
-            {
-                Id = 7,
-                GameId = 4,
-                GenreId = 2
-            },
-            new GameGenre
-            {
-                Id = 8,
-                GameId = 4,
-                GenreId = 5
-            },
-            new GameGenre
-            {
-                Id = 9,
-                GameId = 5,
-                GenreId = 1
-            },
-            new GameGenre
-            {
-                Id = 10,
-                GameId = 5,
-                GenreId = 2
-            },
-            new GameGenre
-            {
-                Id = 11,
-                GameId = 6,
-                GenreId = 4
-            },
-            new GameGenre
-            {
-                Id = 12,
-                GameId = 6,
-                GenreId = 2
-            }
+            new GameGenre { Id = 1, GameId = 1, GenreId = 3 },
+            new GameGenre { Id = 2, GameId = 1, GenreId = 2 },
+            new GameGenre { Id = 3, GameId = 2, GenreId = 2 },
+            new GameGenre { Id = 4, GameId = 2, GenreId = 5 },
+            new GameGenre { Id = 5, GameId = 3, GenreId = 1 },
+            new GameGenre { Id = 6, GameId = 3, GenreId = 2 },
+            new GameGenre { Id = 7, GameId = 4, GenreId = 2 },
+            new GameGenre { Id = 8, GameId = 4, GenreId = 5 },
+            new GameGenre { Id = 9, GameId = 5, GenreId = 1 },
+            new GameGenre { Id = 10, GameId = 5, GenreId = 2 },
+            new GameGenre { Id = 11, GameId = 6, GenreId = 4 },
+            new GameGenre { Id = 12, GameId = 6, GenreId = 2 }
         );
 
         modelBuilder.Entity<LibraryItem>().HasData(

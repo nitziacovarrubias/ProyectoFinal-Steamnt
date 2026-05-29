@@ -19,6 +19,12 @@ public class Developer
     [MaxLength(100)]
     public string Country { get; set; } = string.Empty; // país de procedencia
 
+    [MaxLength(500)]
+    public string LogoUrl { get; set; } = string.Empty;
+
+    [MaxLength(500)]
+    public string BannerUrl { get; set; } = string.Empty;
+
     public bool IsActive { get; set; } = true; // estado del perfil
 
     public DateTime CreatedAt { get; set; } = DateTime.Now;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Steamnt.Api.Data;
 
@@ -11,9 +12,11 @@ using Steamnt.Api.Data;
 namespace Steamnt.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260529091635_AgregarCamposImagenes")]
+    partial class AgregarCamposImagenes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,7 +181,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Pues Pokémon",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/pokemon-region-sonora.zip",
-                            ImageUrl = "/images/home/top-pokemon.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=Pokemon+Region+Sonora",
                             IsPublished = true,
                             Price = 10.00m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -191,7 +194,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Pues Minecraft",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/minecraft.zip",
-                            ImageUrl = "/images/home/top-minecraft.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=Minecraft",
                             IsPublished = true,
                             Price = 35.50m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -204,7 +207,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Juego de aventura donde debes capturar a Dora antes de que sea demasiado tarde y llegue a otro continente.",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/captura-a-dora.zip",
-                            ImageUrl = "/images/home/dora.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=Captura+a+Dora",
                             IsPublished = true,
                             Price = 3.99m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -217,7 +220,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Explora Hermosillo, visita Pueblitos, sobrevive al calor y a los baches.",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/paseo-hermosillo.zip",
-                            ImageUrl = "/images/home/hermosillo.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=Un+Paseo+por+Hermosillo",
                             IsPublished = true,
                             Price = 24.99m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -230,7 +233,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Juego de mundo abierto donde recorres Obregón y tratas de no quedarte sin gasolina.",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/gta-obregon.zip",
-                            ImageUrl = "/images/home/top-gta-obregon.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=GTA+Obregon",
                             IsPublished = true,
                             Price = 35.50m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -243,7 +246,7 @@ namespace Steamnt.Api.Migrations
                             Description = "Intenta entrar al ITH mientras se presenta una huelga por el precio de los papaboneless",
                             DeveloperId = 1,
                             DownloadUrl = "https://example.com/huelga-ith.zip",
-                            ImageUrl = "/images/home/top-ith-huelga.jpg",
+                            ImageUrl = "https://via.placeholder.com/400x250?text=huelga+ITH",
                             IsPublished = true,
                             Price = 34.99m,
                             ReleaseDate = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -267,9 +270,10 @@ namespace Steamnt.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
-
                     b.HasIndex("GenreId");
+
+                    b.HasIndex("GameId", "GenreId")
+                        .IsUnique();
 
                     b.ToTable("GameGenres");
 
@@ -432,7 +436,8 @@ namespace Steamnt.Api.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "GameId")
+                        .IsUnique();
 
                     b.ToTable("LibraryItems");
 
@@ -482,6 +487,9 @@ namespace Steamnt.Api.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Users");
 

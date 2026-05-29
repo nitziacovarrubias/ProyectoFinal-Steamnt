@@ -3,44 +3,90 @@ import { useDispatch, useSelector } from 'react-redux'
 import '../styles/GameCard.css'
 import { agregarJuegoALibrary } from '../utilities/redux/actions/LibraryAction'
 
+const imagenesLocales = {
+    pokemon: '/images/home/top-pokemon.jpg',
+    pokémon: '/images/home/top-pokemon.jpg',
+    minecraft: '/images/home/top-minecraft.jpg',
+    dora: '/images/home/dora.jpg',
+    hermosillo: '/images/home/hermosillo.jpg',
+    obregon: '/images/home/top-gta-obregon.jpg',
+    obregón: '/images/home/top-gta-obregon.jpg',
+    huelga: '/images/home/top-ith-huelga.jpg'
+}
+
+function obtenerImagenJuego(juego) {
+    if (juego.imageUrl) {
+        return juego.imageUrl
+    }
+
+    const titulo = juego.title?.toLowerCase() || ''
+
+    const claveImagen = Object.keys(imagenesLocales).find(clave =>
+        titulo.includes(clave)
+    )
+
+    return claveImagen ? imagenesLocales[claveImagen] : '/images/home/default-game.jpg'
+}
+
 function GameCard({ juego }) {
+    const dispatch = useDispatch()
 
-  const dispatch = useDispatch()
-  const libraryState = useSelector((state) => state.library)
+    const userIdRedux = useSelector((state) => state.auth.usuarioId)
 
-  const userId = useSelector((state) => state.auth.usuarioId)
+    function obtenerUserId() {
+        if (userIdRedux) {
+            return userIdRedux
+        }
 
-  const addGame = () => {
-    console.log(userId)
-    console.log(juego.id)
-    return dispatch(agregarJuegoALibrary({ userId, gameId: juego.id }))
-  }
+        try {
+            const user = JSON.parse(localStorage.getItem('user'))
+            return user?.id
+        } catch {
+            return null
+        }
+    }
+
+    function addGame() {
+        const userId = obtenerUserId()
+
+        if (!userId) {
+            return
+        }
+
+        dispatch(agregarJuegoALibrary({ userId, gameId: juego.id }))
+    }
 
     function mostrarGeneros() {
         if (juego.genres && juego.genres.length > 0) {
-            return juego.genres.join(', ')
+            return juego.genres
+                .map(genero => typeof genero === 'string' ? genero : genero.name)
+                .join(', ')
         }
 
         return 'Sin género'
     }
 
     function mostrarPrecio() {
-        if (juego.price === 0) {
+        const precio = Number(juego.price)
+
+        if (precio === 0) {
             return 'Gratis'
         }
 
-        return '$' + juego.price
+        return `$${precio.toFixed(2)}`
     }
 
     return (
         <article className="game-card">
-            <div className="game-card-imagen">
-                {juego.imageUrl ? (
-                    <img src={juego.imageUrl} alt={juego.title} />
-                ) : (
-                    <span>Sin imagen</span>
-                )}
-            </div>
+            <Link to={`/game/${juego.id}`} className="game-card-imagen">
+                <img
+                    src={obtenerImagenJuego(juego)}
+                    alt={juego.title}
+                    onError={(e) => {
+                        e.currentTarget.src = '/images/home/default-game.jpg'
+                    }}
+                />
+            </Link>
 
             <div className="game-card-info">
                 <span className="game-card-genero">
@@ -56,7 +102,7 @@ function GameCard({ juego }) {
                 </p>
 
                 <span className="game-card-desarrollador">
-                    {juego.developerName}
+                    {juego.developerName || 'Desarrollador desconocido'}
                 </span>
 
                 <div className="game-card-footer">

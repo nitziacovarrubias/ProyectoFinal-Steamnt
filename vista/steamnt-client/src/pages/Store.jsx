@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import GameCard from '../components/GameCard'
 import { useDispatch, useSelector } from 'react-redux'
 import { listarJuegos } from '../utilities/redux/actions/juegosAction'
@@ -15,99 +15,107 @@ function Store() {
     const [generoId, setGeneroId] = useState('')
 
     useEffect(() => {
-        cargarGeneros()
-    }, [])
+        dispatch(listarGeneros())
+    }, [dispatch])
 
     useEffect(() => {
-        cargarJuegos()
-    }, [busqueda, generoId])
+        dispatch(listarJuegos({
+            busqueda,
+            generoId
+        }))
+    }, [dispatch, busqueda, generoId])
 
-    function cargarGeneros() {
-        dispatch(listarGeneros())
-    }
+    const totalJuegos = juegosState.juegos.length
 
-    function cargarJuegos() {
-        const filtros = {
-            busqueda: busqueda,
-            generoId: generoId
-        }
+    const generoSeleccionado = useMemo(() => {
+        if (!generoId) return 'Todos los géneros'
 
-        dispatch(listarJuegos(filtros))
-    }
-
-    function cambiarBusqueda(e) {
-        setBusqueda(e.target.value)
-    }
-
-    function cambiarGenero(e) {
-        setGeneroId(e.target.value)
-    }
+        const genero = generosState.generos.find(g => String(g.id) === String(generoId))
+        return genero?.name || 'Género seleccionado'
+    }, [generoId, generosState.generos])
 
     return (
         <main className="store">
-            <section className="store-encabezado">
-                <span className="store-etiqueta">
-                    CATÁLOGO DE VIDEOJUEGOS
-                </span>
+            <div className="store-inner">
+                <section className="store-hero">
+                    <div>
+                        <span className="store-eyebrow">
+                            CATÁLOGO DE VIDEOJUEGOS
+                        </span>
 
-                <h1>Tienda SteamNT</h1>
+                        <h1>Tienda SteamNT</h1>
 
-                <p>
-                    Explora los juegos disponibles, filtra por género y encuentra tu siguiente aventura.
-                </p>
-            </section>
+                        <p>
+                            Explora juegos publicados por desarrolladores, encuentra nuevos títulos
+                            y agrega tus favoritos a tu biblioteca.
+                        </p>
+                    </div>
 
-            <section className="store-filtros">
-                <input
-                    type="text"
-                    name="busqueda"
-                    placeholder="Buscar juego..."
-                    value={busqueda}
-                    onChange={cambiarBusqueda}
-                />
-
-                <select
-                    name="generoId"
-                    value={generoId}
-                    onChange={cambiarGenero}
-                >
-                    <option value="">
-                        Todos los géneros
-                    </option>
-
-                    {generosState.generos.map(genero => (
-                        <option key={genero.id} value={genero.id}>
-                            {genero.name}
-                        </option>
-                    ))}
-                </select>
-            </section>
-
-            {juegosState.loading ? (
-                <p className="store-mensaje">
-                    Cargando juegos...
-                </p>
-            ) : null}
-
-            {juegosState.error ? (
-                <p className="store-error">
-                    {juegosState.error}
-                </p>
-            ) : null}
-
-            {!juegosState.loading && !juegosState.error && juegosState.juegos.length === 0 ? (
-                <p className="store-mensaje">
-                    No hay juegos disponibles.
-                </p>
-            ) : null}
-
-            {!juegosState.loading && !juegosState.error && juegosState.juegos.length > 0 ? (
-                <section className="store-grid">
-                    {juegosState.juegos.map(juego => (
-                        <GameCard key={juego.id} juego={juego} />
-                    ))}
+                    <div className="store-hero-summary">
+                        <span>{totalJuegos}</span>
+                        <p>juegos encontrados</p>
+                    </div>
                 </section>
-            ) : null}
+
+                <section className="store-toolbar">
+                    <div className="store-search">
+                        <input
+                            type="text"
+                            name="busqueda"
+                            placeholder="Buscar juego..."
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                        />
+                    </div>
+
+                    <select
+                        name="generoId"
+                        value={generoId}
+                        onChange={(e) => setGeneroId(e.target.value)}
+                    >
+                        <option value="">Todos los géneros</option>
+
+                        {generosState.generos.map(genero => (
+                            <option key={genero.id} value={genero.id}>
+                                {genero.name}
+                            </option>
+                        ))}
+                    </select>
+                </section>
+
+                <div className="store-results-header">
+                    <div>
+                        <span>RESULTADOS</span>
+                        <h2>{generoSeleccionado}</h2>
+                    </div>
+                </div>
+
+                {juegosState.loading && (
+                    <p className="store-message">
+                        Cargando juegos...
+                    </p>
+                )}
+
+                {juegosState.error && (
+                    <p className="store-error">
+                        {juegosState.error}
+                    </p>
+                )}
+
+                {!juegosState.loading && !juegosState.error && juegosState.juegos.length === 0 && (
+                    <p className="store-message">
+                        No hay juegos disponibles con esos filtros.
+                    </p>
+                )}
+
+                {!juegosState.loading && !juegosState.error && juegosState.juegos.length > 0 && (
+                    <section className="store-grid">
+                        {juegosState.juegos.map(juego => (
+                            <GameCard key={juego.id} juego={juego} />
+                        ))}
+                    </section>
+                )}
+            </div>
         </main>
     )
 }

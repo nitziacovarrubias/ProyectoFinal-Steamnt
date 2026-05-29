@@ -11,7 +11,7 @@ import Dashboard from './pages/Desarrollador/Dashboard'
 import SidebarLayout from './components/Sidebar/SidebarLayout'
 import { Toaster } from 'sonner'
 import './App.css'
-
+import Perfil from './pages/Perfil/Perfil'
 function App() {
     return (
         <BrowserRouter>
@@ -28,6 +28,7 @@ function App() {
                     <Route path="/desarrollador" element={<Desarrollador />} />
                     <Route path="/register" element={<Registro />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/perfil" element={<Perfil />} />
 
                     <Route path="/developer/dashboard" element={<Dashboard />} />
                     <Route path="/developer/games" element={<Dashboard />} />
